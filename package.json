@@ -5,5 +5,13 @@
   "dependencies": {
     "express": "^4.15.2",
     "socket.io": "^2.0.3"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ],
+  "scripts": {
+    "start": "node index.js"
   }
 }
