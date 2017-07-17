@@ -15,11 +15,21 @@ rp('http://localhost:5000/')
     .then(console.dir)
     .catch(console.error);
 
+let RedisStore = require('connect-redis')(session);
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.use(require('morgan')('dev'));
-app.use(session({secret: 'ssshhhhh'}));
+
+
+app.use(session({
+    name: 'login-id',
+    secret: 'login-stuff',
+    saveUninitialized: true,
+    resave: true,
+    store: new RedisStore()
+}));
 
 if (process.env.DATABASE_URL){
     pg.defaults.ssl = true;
@@ -34,7 +44,7 @@ app.use(express.static(__dirname + '/public'));
 
 //Default website
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/views/index.ejs');
+    res.sendFile(__dirname + '/public/main.html');
 });
 
 //Just connection stuff

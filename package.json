@@ -4,6 +4,7 @@
   "description": "my first socket.io app",
   "dependencies": {
     "body-parser": "^1.17.2",
+    "connect-redis": "^3.3.0",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
     "express-session": "^1.15.3",
