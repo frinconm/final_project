@@ -63,11 +63,14 @@ app.post('/register', function (request, response) {
         if(err) {
             return response.end("Error uploading file.");
         }
+        else{
+            sessionStuff = {badUser: 0, registered: 1};
+            response.render('pages/main', sessionStuff);
+        }
 
 
     });
-    sessionStuff = {badUser: 0, registered: 1};
-    response.render('pages/main', sessionStuff);
+
 });
 
 app.post('/login', function (request, response, next) {
