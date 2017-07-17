@@ -8,3 +8,36 @@
     width: 100%;
 }
 
+.stay-bot-2{
+    position: fixed;
+    bottom: 22%;
+    width: 100%;
+}
+
+.back-color{
+    background-color: dodgerblue;
+}
+
+.wide{
+    width: 94% !important;
+}
+
+.wider{
+    width: 93% !important;
+}
+
+.form-control {
+    width: 97% !important;
+}
+
+.form-inline {
+    width: 100% !important;
+}
+
+body{
+    background-color: #6c6c6c;
+}
+
+.buffer-bot{
+    margin-bottom: 17%;
+}

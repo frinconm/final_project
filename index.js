@@ -28,9 +28,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
-//Default website
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/public/main.html');
+    sessionStuff = {badUser: 0, registered: 0};
+    res.render('pages/main', sessionStuff);
 });
 
 //Just connection stuff
@@ -41,9 +41,9 @@ io.on('connection', function(socket){
 });
 
 //Uploading code
-var storage =   multer.diskStorage({
+let storage =   multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, './uploads');
+        callback(null, './public/uploads');
     },
     filename: function (req, file, callback) {
         let extension = file.mimetype;
@@ -54,7 +54,7 @@ var storage =   multer.diskStorage({
     }
 
 });
-var upload = multer({ storage : storage}).single('userPhoto');
+let upload = multer({ storage : storage}).single('userPhoto');
 
 
 //Register endpoint
@@ -63,9 +63,11 @@ app.post('/register', function (request, response) {
         if(err) {
             return response.end("Error uploading file.");
         }
-        response.end("File is uploaded");
-    });
 
+
+    });
+    sessionStuff = {badUser: 0, registered: 1};
+    response.render('pages/main', sessionStuff);
 });
 
 app.post('/login', function (request, response, next) {
@@ -87,7 +89,7 @@ function checkUsername(request, response, next) {
             console.log(err);
         }
 
-        const sql = 'SELECT username, nickname FROM "user" WHERE username = $1';
+        const sql = 'SELECT username, nickname, profile_pic_url FROM "user" WHERE username = $1';
         const params = [username];
 
         let query = client.query(sql, params, function (err, result) {
@@ -103,13 +105,20 @@ function checkUsername(request, response, next) {
                 return next(new Error('Error in session')) // handle error
             }
             else{
-                console.log(result.rows[0].nickname);
-                console.log(result.rows[0].username);
-                console.log(request.session);
-                request.session.username = result.rows[0].username;
-                request.session.nickname = result.rows[0].nickname;
-                sessionStuff = {nickname: request.session.nickname};
-                response.render('pages/index', sessionStuff);
+                if (result.rows.length > 0) {
+                    console.log(result.rows[0].nickname);
+                    console.log(result.rows[0].username);
+                    console.log(request.session);
+                    request.session.username = result.rows[0].username;
+                    request.session.nickname = result.rows[0].nickname;
+                    request.session.profile_pic_url = result.rows[0].profile_pic_url;
+                    sessionStuff = {nickname: request.session.nickname, profile_pic_url: result.rows[0].profile_pic_url};
+                    response.render('pages/index', sessionStuff);
+                }
+                else {
+                    sessionStuff = {badUser: 1, registered: 0};
+                    response.render('pages/main', sessionStuff);
+                }
             }
 
         });
@@ -142,6 +151,9 @@ function addUser(request, filename) {
             if (err) {
                 console.log("Error in query: ");
                 console.log(err);
+            }
+            else{
+                console.log("Is this happening?");
             }
 
         });
