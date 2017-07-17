@@ -8,24 +8,14 @@ let io = require('socket.io')(http); //Web sockets
 let multer = require('multer'); //Uploading files
 let bodyParser = require('body-parser'); //Handling post requests
 let pg = require('pg'); //Postgres
-let session = require('express-session');
-let RedisStore = require('connect-redis')(session);
-
-
+let session = require('cookie-session');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.use(require('morgan')('dev'));
 
-
-app.use(session({
-    name: 'login-id',
-    secret: 'login-stuff',
-    saveUninitialized: true,
-    resave: true,
-    store: new RedisStore({host: process.env.HEROKU_URL, port: process.env.PORT})
-}));
+app.use(session({secret: 'keyboard cat', maxAge: 60000 }));
 
 if (process.env.DATABASE_URL){
     pg.defaults.ssl = true;
@@ -124,8 +114,6 @@ function checkUsername(request, response, next) {
 
         });
     });
-
-    next();
 }
 
 function addUser(request, filename) {
