@@ -9,13 +9,9 @@ let multer = require('multer'); //Uploading files
 let bodyParser = require('body-parser'); //Handling post requests
 let pg = require('pg'); //Postgres
 let session = require('express-session');
-let FileStore = require('session-file-store')(session);
-let rp = require('request-promise');
-rp('http://localhost:5000/')
-    .then(console.dir)
-    .catch(console.error);
-
 let RedisStore = require('connect-redis')(session);
+
+
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -28,7 +24,7 @@ app.use(session({
     secret: 'login-stuff',
     saveUninitialized: true,
     resave: true,
-    store: new RedisStore()
+    store: new RedisStore({host: process.env.HEROKU_URL, port: process.env.PORT})
 }));
 
 if (process.env.DATABASE_URL){
@@ -82,14 +78,14 @@ app.post('/register', function (request, response) {
 
 });
 
-app.post('/login', function (request, response) {
+app.post('/login', function (request, response, next) {
 
-    checkUsername(request, response);
+    checkUsername(request, response, next);
     //console.log('req.session', request.session);
     //console.log("nickname before rendering:" + request.session.nickname);
 });
 
-function checkUsername(request, response) {
+function checkUsername(request, response, next) {
     let client = new pg.Client(connectionString);
 
     let username = request.body.username;
@@ -113,9 +109,13 @@ function checkUsername(request, response) {
                 console.log("Error in query: ");
                 console.log(err);
             }
+            else if (!request.session) {
+                return next(new Error('Error in session')) // handle error
+            }
             else{
                 console.log(result.rows[0].nickname);
                 console.log(result.rows[0].username);
+                console.log(request.session);
                 request.session.username = result.rows[0].username;
                 request.session.nickname = result.rows[0].nickname;
                 sessionStuff = {nickname: request.session.nickname};
@@ -124,6 +124,8 @@ function checkUsername(request, response) {
 
         });
     });
+
+    next();
 }
 
 function addUser(request, filename) {
