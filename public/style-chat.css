@@ -10,7 +10,7 @@
 
 .stay-bot-2{
     position: fixed;
-    bottom: 22%;
+    top: 3%;
     width: 100%;
 }
 
@@ -40,4 +40,8 @@ body{
 
 .buffer-bot{
     margin-bottom: 17%;
+}
+
+.margined{
+    margin-top: 100px;
 }
