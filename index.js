@@ -152,9 +152,6 @@ function addUser(request, filename) {
                 console.log("Error in query: ");
                 console.log(err);
             }
-            else{
-                console.log("Is this happening?");
-            }
 
         });
     });
